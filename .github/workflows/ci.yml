@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          pip install tensorflow-cpu pillow scikit-learn matplotlib numpy pytest
+
+      - name: Unit tests
+        run: pytest -q
+
+      - name: End-to-end smoke test on synthetic data
+        run: python run_pipeline.py --synthetic --scale 0.3 --epochs 3 --results-dir /tmp/results
+
+      - name: Upload smoke-test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: /tmp/results/figures

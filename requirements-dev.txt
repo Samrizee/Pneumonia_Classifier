@@ -1,0 +1,5 @@
+kaggle
+nbformat
+nbconvert
+ipykernel
+pytest
